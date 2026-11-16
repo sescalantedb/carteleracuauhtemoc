@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex"></head><body style="margin:0">
 <title>Cartelera CDMX</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap">
 <style>
 /* Layout: a marquee-style masthead, then a sticky strip of day tabs, then one
    row per film with its showtimes grouped by cinema, like a printed listing. */
@@ -18,8 +18,8 @@
   --warn: #9a5b00;
   --bad: #b3261e;
   --v0: #5a2d8c; --v1: #1f7a4d; --v2: #b0457a; --v3: #1d6fa5; --v4: #9a5b00; --v5: #55606e;
-  --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -45,17 +45,28 @@ button, input { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .mast { display: flex; flex-direction: column; gap: 14px; }
-.mast h1 { margin: 0; font-family: var(--display); font-stretch: 68%; font-weight: 900; text-transform: uppercase;
-  font-size: clamp(2.6rem, 9vw, 4.4rem); line-height: .9; letter-spacing: .01em; text-wrap: balance; }
+.mast h1 { margin: 0; font-family: var(--display); font-weight: 900; text-transform: uppercase;
+  font-size: clamp(2.2rem, 8vw, 3.8rem); line-height: .95; letter-spacing: -.03em; text-wrap: balance; }
 .mast h1 span { color: var(--accent); }
 .mast p { margin: 0; color: var(--muted); max-width: 62ch; }
 .sources { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 0; margin: 0; list-style: none; font-size: 13px; }
-.sources li { display: flex; align-items: baseline; gap: 6px; }
-.sources b { font-weight: 600; }
+.sources li { display: block; }
+.sources li > .dot { display: inline-block; vertical-align: 1px; margin-right: 6px; }
+.sources b { font-weight: 600; margin-right: 6px; }
+.sources span.note { margin-right: 6px; }
+@media (max-width: 640px) { .sources { flex-direction: column; gap: 8px; } .sources li { padding-left: 14px; text-indent: -14px; } }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; align-self: center; background: var(--muted); }
 .ok .dot { background: var(--ok); } .error .dot { background: var(--bad); } .pending .dot { background: transparent; border: 1.5px solid var(--warn); } .partial .dot { background: var(--warn); }
 .sources span.note { color: var(--muted); }
 .sources a { color: var(--accent); text-underline-offset: 2px; }
+.srcs summary { cursor: pointer; list-style: none; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 13px; }
+.srcs summary::-webkit-details-marker { display: none; }
+.srcs summary > b { font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+.srcs summary > b::after { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) translateY(-2px); transition: transform .15s; }
+.srcs[open] summary > b::after { transform: rotate(-135deg) translate(-2px, 0); }
+.srcs summary > span { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); }
+.srcs .sources { margin-top: 10px; }
 
 .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); margin-top: 22px;
   padding-block: 10px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
@@ -65,7 +76,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .day { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 12px 7px;
   cursor: pointer; text-align: center; min-width: 58px; }
 .day small { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.day strong { display: block; font-family: var(--display); font-stretch: 75%; font-weight: 800; font-size: 20px; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.day strong { display: block; font-family: var(--display); font-weight: 800; letter-spacing: -.02em; font-size: 20px; line-height: 1.05; font-variant-numeric: tabular-nums; }
 .day em { display: block; font-style: normal; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .day[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .day[aria-pressed="true"] small, .day[aria-pressed="true"] em { color: inherit; opacity: .85; }
@@ -83,8 +94,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .count { margin: 16px 0 4px; color: var(--muted); font-size: 13px; }
 .films { display: flex; flex-direction: column; }
 .film { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 6px 24px; padding-block: 16px; border-bottom: 1px solid var(--line); }
-.film h2 { margin: 0; font-family: var(--display); font-stretch: 72%; font-weight: 800; text-transform: uppercase; font-size: 1.45rem;
-  line-height: 1.05; letter-spacing: .01em; text-wrap: balance; overflow-wrap: anywhere; }
+.film h2 { margin: 0; font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: 1.2rem;
+  line-height: 1.15; letter-spacing: -.015em; text-wrap: balance; overflow-wrap: anywhere; }
 .film h2 a { color: inherit; text-decoration: none; }
 .film h2 a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 7px; font-size: 12.5px; color: var(--muted); }
@@ -130,7 +141,10 @@ footer { margin-top: 28px; color: var(--muted); font-size: 12.5px; max-width: 70
   <header class="mast">
     <h1>Cartelera <span>CDMX</span></h1>
     <p id="lede"></p>
-    <ul class="sources" id="sources"></ul>
+    <details class="srcs" id="srcs">
+      <summary id="srcsum"></summary>
+      <ul class="sources" id="sources"></ul>
+    </details>
   </header>
 
   <div class="bar">
@@ -182,6 +196,12 @@ function header() {
     `<li class="${esc(s.state)}"><span class="dot"></span><b>${esc(s.name)}</b><span class="note">${esc(s.note)}</span>` +
     (s.links || []).map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join(' · ') +
     '</li>').join('');
+  // One-line summary; the full list folds open (open from the start on wide screens).
+  const label = { ok: 'updated', partial: 'partly updated', error: 'not read', pending: 'no listings' };
+  const n = st => DATA.sources.filter(s => s.state === st).length;
+  $('srcsum').innerHTML = '<b>Sources</b>' + ['ok', 'partial', 'error', 'pending'].filter(n)
+    .map(st => `<span class="${st}"><span class="dot"></span>${n(st)} ${label[st]}</span>`).join('');
+  if (matchMedia('(min-width: 641px)').matches) $('srcs').open = true;
   $('foot').textContent = 'Times come straight from each cinema’s own site and can change; check the cinema before you go. ' +
     'Cinemas usually publish a full week on Thursday, so later days fill in after that.';
 }
