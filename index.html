@@ -102,10 +102,27 @@ a.t { color: inherit; text-decoration: none; }
 a.t:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 .empty { padding: 40px 0; color: var(--muted); }
 footer { margin-top: 28px; color: var(--muted); font-size: 12.5px; max-width: 70ch; }
+/* Cinema filter: inline chips on wide screens; behind a toggle on phones. */
+.vtoggle, .vall { display: none; }
+.vpanel { display: contents; }
+.vtoggle b { font-weight: 600; color: var(--accent); }
+.vtoggle svg { width: 10px; height: 10px; transition: transform .15s; }
+.vtoggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.vall button { border: 0; background: none; padding: 4px 6px; font-size: 13px; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 @media (max-width: 640px) {
+  .wrap { padding-block: 18px 40px; }
   .film { grid-template-columns: minmax(0, 1fr); }
   .venue { grid-template-columns: minmax(0, 1fr); }
-  .sort { margin-left: 0; }
+  .bar { margin-top: 16px; padding-block: 8px; gap: 8px; }
+  .day { padding: 4px 10px 5px; min-width: 52px; }
+  .day strong { font-size: 18px; }
+  .vtoggle { display: inline-flex; }
+  .vpanel { display: none; }
+  .bar.open .vpanel { display: flex; flex-wrap: wrap; gap: 8px; flex: 1 1 100%; order: 4;
+    max-height: 42vh; overflow-y: auto; padding-top: 2px; }
+  .bar.open .vall { display: flex; flex: 1 1 100%; justify-content: flex-end; order: -1; margin-bottom: -4px; }
+  #q { order: 3; flex-basis: 100%; }
+  .sort { margin-left: auto; }
 }
 </style>
 
@@ -119,7 +136,12 @@ footer { margin-top: 28px; color: var(--muted); font-size: 12.5px; max-width: 70
   <div class="bar">
     <div class="days" id="days" role="group" aria-label="Day"></div>
     <div class="tools">
-      <span id="venues" role="group" aria-label="Cinemas" style="display:contents"></span>
+      <button class="chip vtoggle" id="vtoggle" type="button" aria-expanded="false" aria-controls="vpanel">Cinemas <b id="vcount">All</b>
+        <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 3.5 5 7l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+      <span class="vpanel" id="vpanel">
+        <span id="venues" role="group" aria-label="Cinemas" style="display:contents"></span>
+        <span class="vall"><button type="button" data-all="1">Show all</button><button type="button" data-all="0">Hide all</button></span>
+      </span>
       <input id="q" type="search" placeholder="Search a title" aria-label="Search a title">
       <span class="sort" role="group" aria-label="Sort">
         <button id="sort-az" type="button" aria-pressed="true">A–Z</button>
@@ -186,6 +208,8 @@ function render() {
   }).join('');
   $('venues').innerHTML = DATA.venues.map((v, i) =>
     `<button class="chip" type="button" data-v="${esc(v.id)}" style="--vc:var(--v${i % 6})" aria-pressed="${!state.off.has(v.id)}"><i></i>${esc(v.name)}</button>`).join('');
+  const on = DATA.venues.length - state.off.size;
+  $('vcount').textContent = state.off.size ? `${on} of ${DATA.venues.length}` : 'All';
 
   const q = state.q.trim().toLowerCase();
   let rows = DATA.films.map(f => ({ f, shows: showsOn(f, state.date) }))
@@ -219,6 +243,13 @@ function render() {
 $('days').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) { state.date = b.dataset.d; render(); } });
 $('venues').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return;
   state.off.has(b.dataset.v) ? state.off.delete(b.dataset.v) : state.off.add(b.dataset.v); render(); });
+$('vtoggle').addEventListener('click', () => {
+  const open = $('vtoggle').getAttribute('aria-expanded') !== 'true';
+  $('vtoggle').setAttribute('aria-expanded', open);
+  document.querySelector('.bar').classList.toggle('open', open);
+});
+document.querySelector('.vall').addEventListener('click', e => { const b = e.target.closest('[data-all]'); if (!b) return;
+  state.off = b.dataset.all === '1' ? new Set() : new Set(DATA.venues.map(v => v.id)); render(); });
 $('q').addEventListener('input', e => { state.q = e.target.value; render(); });
 $('sort-az').addEventListener('click', () => { state.sort = 'az'; render(); });
 $('sort-time').addEventListener('click', () => { state.sort = 'time'; render(); });
